@@ -1,0 +1,58 @@
+%YAML 1.1
+---
+
+default-rule-path: /etc/suricata/rules
+rule-files:
+  - suricata.rules
+
+vars:
+  address-groups:
+    HOME_NET: "[192.168.56.0/24]"
+    EXTERNAL_NET: "!$HOME_NET"
+
+app-layer:
+  protocols:
+    arp:
+      detection-enabled: yes
+
+detection:
+  icmp-flood:
+    enabled: yes
+    threshold: 5  # Alert if >1000 ICMP packets/sec
+  syn-flood:
+    enabled: yes
+    threshold: 5   # Alert if >500 SYN packets/sec
+
+af-packet:
+  - interface: ens34
+    bpf: ""
+
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      types:
+        - alert
+        - anomaly
+        - tls
+        - http
+        - dns
+  - fast-log:
+      enabled: no
+      filetype: regular
+      filename: fast.json
+  - stats:
+      enabled: yes
+      filename: stats.log
+      interval: 10
+
+
+unix-command:
+  enabled: yes
+  filename: /var/run/suricata/suricata.socket
+
+flow:
+  memcap: 64mb
+  hash-size: 65536
+  prealloc: 10000

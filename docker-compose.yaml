@@ -1,0 +1,226 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./alerts.yaml:/etc/prometheus/alerts.yml
+    networks:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata
+    network_mode: host
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    volumes:
+      - ./suricata-logs:/var/log/suricata
+      - ./suricata-config:/etc/suricata
+      - ./entrypoint.sh:/usr/local/bin/entrypoint.sh
+      - ./suricata-socket:/var/run/suricata
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
+    environment:
+      - INTERFACE=ens34
+    restart: unless-stopped
+
+  suricata-exporter:
+    image: suricata-exporter
+    container_name: suricata-exporter
+    depends_on:
+      - suricata
+    volumes:
+      - ./suricata-logs:/var/log/suricata
+      - ./suricata-socket/suricata.socket:/var/run/suricata/suricata.socket
+    ports:
+      - "9917:9917"
+    command: --suricata.socket-path /var/run/suricata/suricata.socket
+    networks:
+    - monitoring
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    networks:
+      - monitoring
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./suricata-logs:/var/log/suricata
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+    networks:
+      - monitoring
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: opensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+      - plugins.security.disabled=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./opensearch-data:/usr/share/opensearch/data
+    user: "1000:1000"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    networks:
+      - monitoring
+
+  capture:
+    image: ghcr.io/arkime/arkime/arkime:v5-latest
+    container_name: capture
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - ARKIME_ADMIN_PASSWORD=admin
+      - ARKIME_OPENSEARCH=http://opensearch:9200
+      - OS_HOST=opensearch
+      - OS_PORT=9200
+    command: /opt/arkime/bin/docker.sh capture --update-geo
+    volumes:
+      - ./arkime-config:/opt/arkime/etc
+      - ./arkime-pcap:/data/pcap
+      - ./arkime-logs:/data/logs
+    # ports:
+    #   - "8005:8005" # Arkime web interface
+    depends_on:
+      - opensearch
+    #networks:
+    #  - monitoring
+    restart: unless-stopped
+
+  viewer:
+    image: ghcr.io/arkime/arkime/arkime:v5-latest
+    container_name: viewer
+    environment:
+      - ARKIME_ADMIN_PASSWORD=admin
+      - ARKIME_OPENSEARCH=http://opensearch:9200
+      - OS_HOST=opensearch
+      - OS_PORT=9200
+    command: /opt/arkime/bin/docker.sh viewer
+    volumes:
+      - ./arkime-config:/opt/arkime/etc
+      - ./arkime-pcap:/data/pcap
+      - ./arkime-logs:/data/logs
+    ports:
+      - "8005:8005" # Arkime web interface
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  win-ip-randomizer:
+    image: ubuntu:latest
+    container_name: win-ip-randomizer
+    networks:
+      - monitoring
+    command: bash -c "apt-get update && apt-get install -y openssh-client curl iputils-ping && /usr/local/bin/ssh_windows_ip.sh && chown root:root /tmp/windows_ip.txt"
+    volumes:
+      - ./ssh_windows_ip.sh:/usr/local/bin/ssh_windows_ip.sh
+      - ./windows_ip.txt:/tmp/windows_ip.txt
+      - ./ssh_sockets:/tmp/ssh_sockets
+      - ../.ssh/windows_key:/root/.ssh/windows_key:ro
+    environment:
+      - DUCKDNS_TOKEN=a7ce1508-316c-4981-adc5-acd61d51128a
+      - DUCKDNS_DOMAIN=vvm-mon.duckdns.org
+    restart: unless-stopped
+
+  cowrie-ssh-honeypot:
+    image: cowrie/cowrie
+    container_name: cowrie-ssh-honeypot
+    ports:
+      - 2222:2222
+    volumes:
+      - ./cowrie/logs:/var/log/cowrie
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  status-page:
+    container_name: status-page
+    build:
+      context: ./status-page
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./windows_ip.txt:/tmp/windows_ip.txt
+    depends_on:
+      - prometheus
+      - grafana
+      - opensearch
+    networks:
+      - monitoring
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - OPENSEARCH_URL=http://opensearch:9200
+      - GRAFANA_URL=http://grafana:3000
+    restart: unless-stopped
+
+volumes:
+  grafana-storage:
+  opensearch-data:
+  arkime-pcap:
+  arkime-logs:
+
+networks:
+  monitoring:
+    driver: bridge

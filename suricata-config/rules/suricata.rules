@@ -1,0 +1,19 @@
+#alert tcp any any -> any any (msg:"Test TCP packet detected"; sid:1000001; rev:1;)
+alert icmp any any -> $HOME_NET any (msg:"Potential ICMP Ping Flood detected"; itype:8; threshold: type both, track by_src, count 200, seconds 2; sid:1000002; rev:1;)
+alert tcp any any -> $HOME_NET any (msg:"Potential TCP SYN Flood detected"; flow:to_server; flags:S; threshold: type both, track by_dst, count 10, seconds 2; sid:1000003; rev:1;)
+#alert arp any any -> any any (msg:"Potential ARP Spoofing: Excessive ARP replies detected"; arp_opcode:2; threshold: type both, track by_src, count 1, seconds 20; sid:3000001; rev:1;)
+#alert arp any any -> any any (msg:"Generic ARP packet detected"; arp_opcode:2; sid:3000012; rev:1;)
+#alert dns any any -> any any (msg:"Potential DNS Spoofing attempt detected"; dns.flags.response; content:"|00 00|"; offset:2; threshold: type both, track by_src, count 5, seconds 10; sid:3000002; rev:1;)
+#alert dns any any -> $HOME_NET any (msg:"Potential DNS Spoofing attempt detected"; content:"example.com"; dns_query; threshold: type both, track by_src, count 5, seconds 10; sid:3000002; rev:1;)
+
+#alert udp any any -> $HOME_NET any (msg:"Potential DNS Spoofing attempt detected"; content:"example.com"; sid:3000002; rev:1;)
+#alert udp any any -> any any (msg:"Test dns.query option"; dns.query; content:"google"; nocase; sid:1;)
+#alert udp any 53 -> $HOME_NET any (msg:"ET DNS Query Responses with 3 RR's set (50+ in 2 seconds) - possible A RR Cache Poisoning Attempt"; content:"|81 80 00 01 00 01 00 01|"; offset:2; depth:8; threshold: type both, track by_src, count 50, seconds 2; sid:2008475; rev:4;)
+#alert udp any 53 -> $HOME_NET any (msg:"GPL DNS SPOOF query response PTR with TTL of 1 min. and no authority"; content:"|85 80 00 01 00 01 00 00 00 00|"; content:"|C0 0C 00 0C 00 01 00 00 00|<|00 0F|"; sid:2100253; rev:5;)
+#alert udp any any -> $HOME_NET 53 (msg:"GPL DNS zone transfer UDP"; content:"|00 00 FC|"; offset:14; sid:2101948; rev:8;)
+#alert udp any any -> $HOME_NET 53 (msg:"GPL DNS named version attempt"; content:"|07|version"; offset:12; nocase; content:"|04|bind|00|"; offset:12; nocase; sid:2101616; rev:9;)
+#alert udp any 53 -> $HOME_NET any (msg:"Spoofed DNS response detected"; content:"example.com"; sid:3000021; rev:1;)
+
+#port scanning but not quite
+#alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"Potential TCP SYN Port Scan"; flags:S; threshold: type both, track by_src, count 10, seconds 5; sid:2000001; rev:1;)
+#alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"Potential ICMP Ping Sweep"; itype:8; threshold: type both, track by_src, count 5, seconds 2; sid:2000002; rev:1;)

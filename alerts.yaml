@@ -1,0 +1,60 @@
+groups:
+  - name: system_alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 90% for more than 5 minutes"
+
+      - alert: HighMemoryUsage
+        expr: ((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 95% for more than 5 minutes"
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.job }} service is down"
+
+      - alert: HighSuricataAlerts
+        expr: rate(suricata_alerts_total[5m]) > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Suricata alert rate"
+          description: "Suricata is generating more than 100 alerts per second"
+
+
+# groups:
+# - name: suricata-alerts
+#   rules:
+#   - alert: PingFloodDetected
+#     expr: suricata_event_icmp_flood > 0
+#     for: 1m
+#     labels:
+#       severity: critical
+#     annotations:
+#       summary: "Ping flood detected ({{ $value }} packets/sec)"
+#       description: "Suricata detected an ICMP flood on {{ $labels.instance }}"
+
+#   - alert: SynFloodDetected
+#     expr: suricata_event_syn_flood > 0
+#     for: 1m
+#     labels:
+#       severity: critical
+#     annotations:
+#       summary: "SYN flood detected ({{ $value }} packets/sec)"
+#       description: "Suricata detected a SYN flood on {{ $labels.instance }}"

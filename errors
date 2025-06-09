@@ -1,0 +1,134 @@
+
+capture              | Updating GeoIP databases
+viewer               | Starting viewer
+capture              | 2025-04-13 16:01:13 URL:https://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.csv [22972/22972] -> "/tmp/tmp.NMEAGiB3i8" [1]
+viewer               | WARNING - /opt/arkime/etc/config.ini doesn't exist
+viewer               | WARNING - [default] section missing from /opt/arkime/etc/config.ini
+viewer               | WARNING - Using authMode=digest since not set, add to config file to silence this warning.
+viewer               | ERROR - fetching aliases ConnectionError: connect ECONNREFUSED 127.0.0.1:9200
+viewer               | ERROR - OpenSearch/Elasticsearch ConnectionError: connect ECONNREFUSED 127.0.0.1:9200
+viewer               |     at ClientRequest.onError (/opt/arkime/node_modules/@elastic/elasticsearch/lib/Connection.js:114:16)
+viewer               |     at ClientRequest.emit (node:events:518:28)
+viewer               |     at emitErrorEvent (node:_http_client:101:11)
+viewer               |     at Socket.socketErrorListener (node:_http_client:504:5)
+viewer               |     at Socket.emit (node:events:518:28)
+viewer               |     at emitErrorNT (node:internal/streams/destroy:169:8)
+viewer               |     at emitErrorCloseNT (node:internal/streams/destroy:128:3)
+viewer               |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+viewer               |   meta: {
+viewer               |     body: null,
+viewer               |     statusCode: null,
+viewer               |     headers: null,
+viewer               |     meta: {
+viewer               |       context: null,
+viewer               |       request: {
+viewer               |         params: {
+viewer               |           method: 'GET',
+viewer               |           path: '/',
+viewer               |           body: null,
+viewer               |           querystring: '',
+viewer               |           headers: {
+viewer               |             'user-agent': 'elasticsearch-js/7.10.0 (linux 6.11.0-21-generic-x64; Node.js v20.18.3)'
+viewer               |           },
+viewer               |           timeout: 330000
+viewer               |         },
+viewer               |         options: {},
+viewer               |         id: 2
+viewer               |       },
+viewer               |       name: 'elasticsearch-js',
+viewer               |       connection: {
+viewer               |         url: 'http://localhost:9200/',
+viewer               |         id: 'http://localhost:9200/',
+viewer               |         headers: {},
+viewer               |         deadCount: 10,
+viewer               |         resurrectTimeout: 1744561994088,
+viewer               |         _openRequests: 2,
+viewer               |         status: 'dead',
+viewer               |         roles: { master: true, data: true, ingest: true, ml: false }
+viewer               |       },
+viewer               |       attempts: 2,
+viewer               |       aborted: false
+viewer               |     }
+viewer               |   }
+viewer               | }
+viewer               | Getting OpenSearch/Elasticsearch info failed - the above error message might explain why
+viewer               | Common issues:
+viewer               |   * Is OpenSearch/Elasticsearch running and NOT RED?
+viewer               |   * Have you run 'db/db.pl <host:port> init'?
+viewer               |   * Is the 'elasticsearch' setting (http://localhost:9200) correct in config file (/opt/arkime/etc/config.ini) with a username and password if needed? (https://arkime.com/settings#elasticsearch)
+viewer               |   * Do you need the --insecure option? (See https://arkime.com/faq#insecure)
+capture              | 2025-04-13 16:01:14 URL:https://www.wireshark.org/download/automated/data/manuf [2907342/2907342] -> "/tmp/tmp.tCx1Alr0Dp" [1]
+capture              | Starting capture
+capture              | WARNING - Config file '/opt/arkime/etc/config.ini' not found
+capture              | File : /opt/arkime/etc/config.ini seems to be absent/incorrect.
+capture              | Apr 13 16:01:14 main.c:259 parse_args(): WARNING: gethostname doesn't return a fully qualified name and getdomainname failed, this may cause issues when viewing pcaps, use the --host option - 95992cc1c4b9
+capture              | Apr 13 16:01:14 config.c:638 arkime_config_load(): Couldn't load config file (/opt/arkime/etc/config.ini) No such file or directory
+capture              | vvvvvvvvvvvvvvvvvvvvvvvvv IMPORTANT vvvvvvvvvvvvvvvvvvvvvvvvv
+capture              | FATAL CONFIG ERROR - Please set interface= in the [default] or [95992cc1c4b9] section of the config file (/opt/arkime/etc/config.ini) OR on the capture command line use either a pcap file (-r) or pcap directory (-R) switch. You need to fix this before Arkime can continue.
+capture              | ^^^^^^^^^^^^^^^^^^^^^^^^^ IMPORTANT ^^^^^^^^^^^^^^^^^^^^^^^^^
+viewer               | WARNING - /opt/arkime/etc/config.ini doesn't exist
+viewer               | WARNING - [default] section missing from /opt/arkime/etc/config.ini
+viewer               | WARNING - Using authMode=digest since not set, add to config file to silence this warning.
+capture              | 2025-04-13 16:01:15 URL:https://www.iana.org/assignments/ipv4-address-space/ipv4-address-space.csv [22972/22972] -> "/tmp/tmp.5cQaheJ1Q2" [1]
+viewer               | ERROR - fetching aliases ConnectionError: connect ECONNREFUSED 127.0.0.1:9200
+viewer               | ERROR - OpenSearch/Elasticsearch ConnectionError: connect ECONNREFUSED 127.0.0.1:9200
+viewer               |     at ClientRequest.onError (/opt/arkime/node_modules/@elastic/elasticsearch/lib/Connection.js:114:16)
+viewer               |     at ClientRequest.emit (node:events:518:28)
+viewer               |     at emitErrorEvent (node:_http_client:101:11)
+viewer               |     at Socket.socketErrorListener (node:_http_client:504:5)
+viewer               |     at Socket.emit (node:events:518:28)
+viewer               |     at emitErrorNT (node:internal/streams/destroy:169:8)
+viewer               |     at emitErrorCloseNT (node:internal/streams/destroy:128:3)
+viewer               |     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+viewer               |   meta: {
+viewer               |     body: null,
+viewer               |     statusCode: null,
+viewer               |     headers: null,
+viewer               |     meta: {
+viewer               |       context: null,
+viewer               |       request: {
+viewer               |         params: {
+viewer               |           method: 'GET',
+viewer               |           path: '/',
+viewer               |           body: null,
+viewer               |           querystring: '',
+viewer               |           headers: {
+viewer               |             'user-agent': 'elasticsearch-js/7.10.0 (linux 6.11.0-21-generic-x64; Node.js v20.18.3)'
+viewer               |           },
+viewer               |           timeout: 330000
+viewer               |         },
+viewer               |         options: {},
+viewer               |         id: 2
+viewer               |       },
+viewer               |       name: 'elasticsearch-js',
+viewer               |       connection: {
+viewer               |         url: 'http://localhost:9200/',
+viewer               |         id: 'http://localhost:9200/',
+viewer               |         headers: {},
+viewer               |         deadCount: 10,
+viewer               |         resurrectTimeout: 1744561995677,
+viewer               |         _openRequests: 2,
+viewer               |         status: 'dead',
+viewer               |         roles: { master: true, data: true, ingest: true, ml: false }
+viewer               |       },
+viewer               |       attempts: 2,
+viewer               |       aborted: false
+viewer               |     }
+viewer               |   }
+viewer               | }
+viewer               | Getting OpenSearch/Elasticsearch info failed - the above error message might explain why
+viewer               | Common issues:
+viewer               |   * Is OpenSearch/Elasticsearch running and NOT RED?
+viewer               |   * Have you run 'db/db.pl <host:port> init'?
+viewer               |   * Is the 'elasticsearch' setting (http://localhost:9200) correct in config file (/opt/arkime/etc/config.ini) with a username and password if needed? (https://arkime.com/settings#elasticsearch)
+viewer               |   * Do you need the --insecure option? (See https://arkime.com/faq#insecure)
+capture              | 2025-04-13 16:01:15 URL:https://www.wireshark.org/download/automated/data/manuf [2907342/2907342] -> "/tmp/tmp.oJNnVVqRbv" [1]
+viewer exited with code 0
+capture              | Starting capture
+capture              | WARNING - Config file '/opt/arkime/etc/config.ini' not found
+capture              | File : /opt/arkime/etc/config.ini seems to be absent/incorrect.
+capture              | Apr 13 16:01:15 main.c:259 parse_args(): WARNING: gethostname doesn't return a fully qualified name and getdomainname failed, this may cause issues when viewing pcaps, use the --host option - 95992cc1c4b9
+capture              | Apr 13 16:01:15 config.c:638 arkime_config_load(): Couldn't load config file (/opt/arkime/etc/config.ini) No such file or directory
+capture              | vvvvvvvvvvvvvvvvvvvvvvvvv IMPORTANT vvvvvvvvvvvvvvvvvvvvvvvvv
+capture              | FATAL CONFIG ERROR - Please set interface= in the [default] or [95992cc1c4b9] section of the config file (/opt/arkime/etc/config.ini) OR on the capture command line use either a pcap file (-r) or pcap directory (-R) switch. You need to fix this before Arkime can continue.
+capture              | ^^^^^^^^^^^^^^^^^^^^^^^^^ IMPORTANT ^^^^^^^^^^^^^^^^^^^^^^^^^
